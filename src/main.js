@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import './style.css';
 import Swal from "sweetalert2";
 
@@ -44,19 +45,23 @@ const createCard = (coins) => {
     });
 };
 
-function fetchApi(coin) {
+async function fetchApi(coin) {
     const url = `https://api.exchangerate.host/live?access_key=fb7cbd03c420454e9b8447fd6434a94f&base=${coin}`;
-    return fetch(url)
-      .then((response) => response.json())
-      .then((data) =>  {
-        if (data.error || !data.quotes) {  // Verifica se há erro ou se os dados esperados não estão presentes
-          throw new Error('Moeda não encontrada ou erro na API');
-        }
-        return Object.entries(data.quotes); // Supondo que data.rates contenha as cotações
-      } );
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.error || !data.quotes) {
+            throw new Error('Moeda não encontrada ou erro na API');
+    }
+        return Object.entries(data.quotes);
+  } catch (error) {
+    throw error
   }
+}
   
-  function handleSearch() {
+async function handleSearch() {
     const coin = coinInput.value.trim();
     if (!coin) {
       return Swal.fire({
@@ -65,8 +70,9 @@ function fetchApi(coin) {
         text: "Você precisa digitar uma moeda"
       });
     }
-    fetchApi(coin)
-      .then((response) => {
+
+    try {
+        const response = fetchApi(coin);
         if (response && response.length > 0) {
           createCard(response);
         } else {
@@ -76,13 +82,13 @@ function fetchApi(coin) {
             text: "Nenhuma moeda encontrada."
           });
         }
-      })
-      .catch(() => Swal.fire({
+     } catch (error) {
+        Swal.fire({
         icon: "error",
         title: "Opss..",
-        text: "Digite o valor de uma moeda existente."
-      }));
+        text: error.message || "Digite o valor de uma moeda existente."
+      });
   }
-  
+} 
 
 searchBtn.addEventListener("click", handleSearch);
