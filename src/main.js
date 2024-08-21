@@ -6,8 +6,6 @@ const searchBtn = document.querySelector("#search-button");
 const coinInput = document.querySelector("#input-coin")
 const coinsList = document.querySelector("#display")
 
-const token = import.meta.env.VITE_TOKEN;
-
 const divStyle = (div, p1, p2) => {
   div.style.backgroundColor = 'rgba(255, 255, 255, .2)';
   div.style.width = '140px';
